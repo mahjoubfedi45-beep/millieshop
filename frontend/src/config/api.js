@@ -3,12 +3,12 @@ const API_CONFIG = {
   // Development (local testing)
   development: 'http://localhost:5000',
   
-  // Production (deployed backend) - UPDATE THIS WITH YOUR RENDER URL
-  production: 'https://YOUR-RENDER-URL-HERE.onrender.com', // Replace with your actual Render URL
+  // Production (deployed backend) - REPLACE WITH YOUR ACTUAL RENDER URL
+  production: 'https://millieshop-backend.onrender.com', // Replace this with your actual Render URL
   
   // Current environment
   baseURL: process.env.NODE_ENV === 'production' 
-    ? 'https://YOUR-RENDER-URL-HERE.onrender.com'  // Replace with your actual Render URL
+    ? 'https://millieshop-backend.onrender.com'  // Replace this with your actual Render URL
     : 'http://localhost:5000'
 };
 
