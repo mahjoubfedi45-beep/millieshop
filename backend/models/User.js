@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs');
-const db = require('../utils/database');
+const db = require('../utils/githubStorage');
 
 class User {
   static async create(userData) {

@@ -1,4 +1,4 @@
-const db = require('../utils/database');
+const db = require('../utils/githubStorage');
 
 class Product {
   static create(productData) {
