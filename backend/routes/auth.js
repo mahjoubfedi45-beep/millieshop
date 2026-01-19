@@ -200,4 +200,28 @@ router.post('/create-admin', async (req, res) => {
   }
 });
 
+// Route de debug pour vérifier les utilisateurs admin
+router.get('/debug-admin', async (req, res) => {
+  try {
+    const admins = await User.find({ role: 'admin' }).select('-password');
+    res.json({ 
+      message: 'Administrateurs trouvés',
+      count: admins.length,
+      admins: admins
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Route pour supprimer tous les admins (debug)
+router.delete('/reset-admin', async (req, res) => {
+  try {
+    await User.deleteMany({ role: 'admin' });
+    res.json({ message: 'Tous les administrateurs ont été supprimés' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 module.exports = router;
