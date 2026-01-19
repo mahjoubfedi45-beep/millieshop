@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { API_BASE_URL } from '../config/api';
 import './AdminPanel.css';
 
@@ -61,6 +61,34 @@ export default function AdminPanel() {
   const [editingProduct, setEditingProduct] = useState(null);
   const [newCategory, setNewCategory] = useState('');
 
+  const fetchOrders = useCallback(async () => {
+    if (!adminToken) {
+      console.log('Pas de token admin disponible');
+      return;
+    }
+    
+    try {
+      console.log('🔄 Récupération des commandes...');
+      const response = await fetch(`${API_BASE_URL}/api/orders`, {
+        headers: {
+          'Authorization': `Bearer ${adminToken}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('✅ Commandes récupérées:', data);
+        setOrders(data.orders || []);
+      } else {
+        console.error('❌ Erreur lors de la récupération des commandes:', response.status);
+        const errorText = await response.text();
+        console.error('Détails de l\'erreur:', errorText);
+      }
+    } catch (error) {
+      console.error('❌ Erreur réseau:', error);
+    }
+  }, [adminToken]);
+
   useEffect(() => {
     // Vérifier si l'admin est déjà connecté
     const savedToken = localStorage.getItem('admin_token');
@@ -72,14 +100,13 @@ export default function AdminPanel() {
   }, []);
 
   // Effet séparé pour charger les données quand le token est disponible
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (adminToken && isAuthenticated) {
       fetchProducts();
       fetchOrders();
       loadSiteSettings();
     }
-  }, [adminToken, isAuthenticated]);
+  }, [adminToken, isAuthenticated, fetchOrders]);
 
   const handleAdminLogin = async (e) => {
     e.preventDefault();
@@ -137,34 +164,6 @@ export default function AdminPanel() {
       setProducts(data.products || []);
     } catch (error) {
       console.error('Erreur:', error);
-    }
-  };
-
-  const fetchOrders = async () => {
-    if (!adminToken) {
-      console.log('Pas de token admin disponible');
-      return;
-    }
-    
-    try {
-      console.log('🔄 Récupération des commandes...');
-      const response = await fetch(`${API_BASE_URL}/api/orders`, {
-        headers: {
-          'Authorization': `Bearer ${adminToken}`
-        }
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        console.log('✅ Commandes récupérées:', data);
-        setOrders(data.orders || []);
-      } else {
-        console.error('❌ Erreur lors de la récupération des commandes:', response.status);
-        const errorText = await response.text();
-        console.error('Détails de l\'erreur:', errorText);
-      }
-    } catch (error) {
-      console.error('❌ Erreur réseau:', error);
     }
   };
 
