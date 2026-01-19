@@ -1,4 +1,4 @@
-const db = require('../utils/database');
+const db = require('../utils/supabase');
 const bcrypt = require('bcryptjs');
 
 class User {

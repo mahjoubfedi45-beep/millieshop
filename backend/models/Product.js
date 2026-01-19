@@ -1,4 +1,4 @@
-const db = require('../utils/database');
+const db = require('../utils/supabase');
 
 class Product {
   static async create(productData) {

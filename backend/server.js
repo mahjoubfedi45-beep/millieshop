@@ -14,8 +14,8 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Initialize database
-const db = require('./utils/database');
+// Initialize Supabase database
+const db = require('./utils/supabase');
 
 // Health check
 app.get('/', (req, res) => {
@@ -23,7 +23,7 @@ app.get('/', (req, res) => {
     message: 'Millie Shop API is running!',
     version: '1.0.0',
     status: 'healthy',
-    database: 'PostgreSQL',
+    database: 'Supabase (Real-time)',
     timestamp: new Date().toISOString()
   });
 });

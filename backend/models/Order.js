@@ -1,4 +1,4 @@
-const db = require('../utils/database');
+const db = require('../utils/supabase');
 
 class Order {
   static async create(orderData) {
@@ -6,8 +6,7 @@ class Order {
   }
 
   static async findById(id) {
-    const result = await db.query('SELECT * FROM orders WHERE id = $1', [id]);
-    return result.rows[0];
+    return await db.getOrderById(id);
   }
 
   static async findByUser(userId) {

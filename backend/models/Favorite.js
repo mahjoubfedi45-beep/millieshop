@@ -1,4 +1,4 @@
-const db = require('../utils/database');
+const db = require('../utils/supabase');
 
 class Favorite {
   static async create(favoriteData) {
@@ -10,11 +10,8 @@ class Favorite {
   }
 
   static async findByUserAndProduct(userId, productId) {
-    const result = await db.query(
-      'SELECT * FROM favorites WHERE user_id = $1 AND product_id = $2',
-      [userId, productId]
-    );
-    return result.rows[0];
+    const favorites = await db.getFavoritesByUser(userId);
+    return favorites.find(f => f.product_id === productId);
   }
 
   static async deleteByUserAndProduct(userId, productId) {
