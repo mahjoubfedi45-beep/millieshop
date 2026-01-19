@@ -3,12 +3,12 @@ const API_CONFIG = {
   // Development (local testing)
   development: 'http://localhost:5001',
   
-  // Production (deployed backend) - UPDATE THIS WITH YOUR BACKEND URL
-  production: 'https://your-backend-url.railway.app', // Replace with your actual backend URL
+  // Production (deployed backend)
+  production: 'https://millieshop.onrender.com',
   
   // Current environment
   baseURL: process.env.NODE_ENV === 'production' && window.location.hostname !== 'localhost'
-    ? 'https://your-backend-url.railway.app'  // Replace with your actual backend URL
+    ? 'https://millieshop.onrender.com'
     : 'http://localhost:5001' // Local development
 };
 
