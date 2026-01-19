@@ -39,11 +39,11 @@ router.get('/', async (req, res) => {
     const skip = (page - 1) * limit;
     
     // Get all products
-    let products = Product.findAll();
+    let products = await Product.findAll();
     
     // Search filter
     if (req.query.search) {
-      products = Product.search(req.query.search);
+      products = await Product.search(req.query.search);
     }
     
     // Category filter
@@ -78,15 +78,15 @@ router.get('/', async (req, res) => {
           products.sort((a, b) => b.name.localeCompare(a.name));
           break;
         case 'newest':
-          products.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+          products.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
           break;
         default:
-          products.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+          products.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
       }
     }
     
     // Get unique categories
-    const allProducts = Product.findAll();
+    const allProducts = await Product.findAll();
     const categories = [...new Set(allProducts.map(p => p.category))];
     
     // Pagination
@@ -104,7 +104,8 @@ router.get('/', async (req, res) => {
       categories
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('Products API Error:', error);
+    res.status(500).json({ message: error.message, stack: error.stack });
   }
 });
 
