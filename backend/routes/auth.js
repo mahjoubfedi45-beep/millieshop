@@ -178,8 +178,8 @@ router.post('/create-admin', async (req, res) => {
     // Créer l'admin avec des identifiants par défaut
     const admin = new User({
       name: 'Admin Millie Shop',
-      email: 'admin@millieshop.com',
-      password: 'admin123456',
+      email: 'admin@millie-shop.com',
+      password: 'admin123',
       role: 'admin',
       address: 'Tunis, Tunisie',
       phone: '+216 12 345 678'
@@ -190,8 +190,8 @@ router.post('/create-admin', async (req, res) => {
     res.status(201).json({
       message: 'Administrateur créé avec succès',
       admin: {
-        email: 'admin@millieshop.com',
-        password: 'admin123456',
+        email: 'admin@millie-shop.com',
+        password: 'admin123',
         note: 'Changez ce mot de passe après la première connexion'
       }
     });
