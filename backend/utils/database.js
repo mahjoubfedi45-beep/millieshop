@@ -3,15 +3,30 @@ const { Pool } = require('pg');
 class PostgreSQLDB {
   constructor() {
     this.pool = new Pool({
-      connectionString: process.env.DATABASE_URL || 'postgresql://localhost:5432/millieshop',
+      connectionString: process.env.DATABASE_URL,
       ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
     });
     
-    this.initTables();
+    // Test connection and initialize tables
+    this.testConnection();
+  }
+
+  async testConnection() {
+    try {
+      const client = await this.pool.connect();
+      console.log('✅ PostgreSQL connected successfully');
+      client.release();
+      await this.initTables();
+    } catch (error) {
+      console.error('❌ PostgreSQL connection failed:', error.message);
+      console.error('Connection string format should be: postgresql://user:password@host:port/database');
+    }
   }
 
   async initTables() {
     try {
+      console.log('🔄 Initializing PostgreSQL tables...');
+      
       // Create users table
       await this.pool.query(`
         CREATE TABLE IF NOT EXISTS users (
@@ -25,6 +40,7 @@ class PostgreSQLDB {
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
       `);
+      console.log('✅ Users table ready');
 
       // Create products table
       await this.pool.query(`
@@ -43,6 +59,7 @@ class PostgreSQLDB {
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
       `);
+      console.log('✅ Products table ready');
 
       // Create orders table
       await this.pool.query(`
@@ -58,6 +75,7 @@ class PostgreSQLDB {
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
       `);
+      console.log('✅ Orders table ready');
 
       // Create favorites table
       await this.pool.query(`
@@ -69,6 +87,7 @@ class PostgreSQLDB {
           UNIQUE(user_id, product_id)
         )
       `);
+      console.log('✅ Favorites table ready');
 
       // Insert default admin user if not exists
       const adminExists = await this.pool.query(
@@ -88,6 +107,7 @@ class PostgreSQLDB {
           'Tunis, Tunisie',
           '+216 12 345 678'
         ]);
+        console.log('✅ Admin user created');
       }
 
       // Insert sample products if table is empty
@@ -163,11 +183,13 @@ class PostgreSQLDB {
             product.sizes
           ]);
         }
+        console.log('✅ Sample products created');
       }
 
-      console.log('✅ PostgreSQL tables initialized successfully');
+      console.log('✅ PostgreSQL database initialization complete!');
     } catch (error) {
-      console.error('❌ Error initializing PostgreSQL tables:', error);
+      console.error('❌ Error initializing PostgreSQL tables:', error.message);
+      console.error('Full error:', error);
     }
   }
 
