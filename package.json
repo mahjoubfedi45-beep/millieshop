@@ -1,0 +1,15 @@
+{
+  "name": "millie-shop",
+  "version": "1.0.0",
+  "description": "E-commerce website for Millie Shop",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "serverless-http": "^3.2.0"
+  },
+  "keywords": ["ecommerce", "react", "nodejs"],
+  "author": "",
+  "license": "ISC"
+}
