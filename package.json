@@ -1,23 +1,17 @@
 {
   "name": "millie-shop",
   "version": "1.0.0",
-  "description": "E-commerce website for Millie Shop",
-  "main": "index.js",
+  "description": "E-commerce website for Millie Shop - Women's Fashion",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "install-all": "cd backend && npm install && cd ../frontend && npm install",
+    "dev": "concurrently \"cd backend && npm run dev\" \"cd frontend && npm start\"",
+    "build": "cd frontend && npm run build",
+    "start": "cd backend && npm start"
   },
-  "dependencies": {
-    "bcryptjs": "^3.0.3",
-    "cors": "^2.8.5",
-    "dotenv": "^16.6.1",
-    "express": "^4.22.1",
-    "jsonwebtoken": "^9.0.3",
-    "mongoose": "^7.8.8",
-    "multer": "^1.4.5-lts.1",
-    "nodemailer": "^7.0.12",
-    "serverless-http": "^3.2.0"
-  },
-  "keywords": ["ecommerce", "react", "nodejs"],
-  "author": "",
-  "license": "ISC"
+  "keywords": ["ecommerce", "react", "nodejs", "fashion", "millie-shop"],
+  "author": "Millie Shop",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^7.6.0"
+  }
 }
