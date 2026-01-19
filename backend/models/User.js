@@ -1,4 +1,4 @@
-const db = require('../utils/supabase');
+const db = require('../utils/jsonapi');
 const bcrypt = require('bcryptjs');
 
 class User {

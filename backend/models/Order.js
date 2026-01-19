@@ -1,4 +1,4 @@
-const db = require('../utils/supabase');
+const db = require('../utils/jsonapi');
 
 class Order {
   static async create(orderData) {
