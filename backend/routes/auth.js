@@ -166,4 +166,38 @@ router.put('/change-password', auth, async (req, res) => {
   }
 });
 
+// Route pour créer un admin (à utiliser une seule fois)
+router.post('/create-admin', async (req, res) => {
+  try {
+    // Vérifier si un admin existe déjà
+    const existingAdmin = await User.findOne({ role: 'admin' });
+    if (existingAdmin) {
+      return res.status(400).json({ message: 'Un administrateur existe déjà' });
+    }
+
+    // Créer l'admin avec des identifiants par défaut
+    const admin = new User({
+      name: 'Admin Millie Shop',
+      email: 'admin@millieshop.com',
+      password: 'admin123456',
+      role: 'admin',
+      address: 'Tunis, Tunisie',
+      phone: '+216 12 345 678'
+    });
+
+    await admin.save();
+
+    res.status(201).json({
+      message: 'Administrateur créé avec succès',
+      admin: {
+        email: 'admin@millieshop.com',
+        password: 'admin123456',
+        note: 'Changez ce mot de passe après la première connexion'
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 module.exports = router;
