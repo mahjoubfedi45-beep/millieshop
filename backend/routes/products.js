@@ -38,58 +38,68 @@ router.get('/', async (req, res) => {
     const limit = parseInt(req.query.limit) || 12;
     const skip = (page - 1) * limit;
     
-    // Construire la requête de recherche
-    let query = {};
+    // Get all products
+    let products = Product.findAll();
     
-    // Recherche par nom
+    // Search filter
     if (req.query.search) {
-      query.name = { $regex: req.query.search, $options: 'i' };
+      products = Product.search(req.query.search);
     }
     
-    // Filtre par catégorie - case insensitive matching
+    // Category filter
     if (req.query.category && req.query.category !== 'all') {
-      query.category = { $regex: new RegExp(`^${req.query.category}$`, 'i') };
+      products = products.filter(product => 
+        product.category.toLowerCase() === req.query.category.toLowerCase()
+      );
     }
     
-    // Filtre par prix
+    // Price range filter
     if (req.query.minPrice || req.query.maxPrice) {
-      query.price = {};
-      if (req.query.minPrice) {
-        query.price.$gte = parseFloat(req.query.minPrice);
-      }
-      if (req.query.maxPrice) {
-        query.price.$lte = parseFloat(req.query.maxPrice);
+      const minPrice = parseFloat(req.query.minPrice) || 0;
+      const maxPrice = parseFloat(req.query.maxPrice) || Infinity;
+      products = products.filter(product => 
+        product.price >= minPrice && product.price <= maxPrice
+      );
+    }
+    
+    // Sort
+    if (req.query.sort) {
+      switch (req.query.sort) {
+        case 'price_asc':
+          products.sort((a, b) => a.price - b.price);
+          break;
+        case 'price_desc':
+          products.sort((a, b) => b.price - a.price);
+          break;
+        case 'name_asc':
+          products.sort((a, b) => a.name.localeCompare(b.name));
+          break;
+        case 'name_desc':
+          products.sort((a, b) => b.name.localeCompare(a.name));
+          break;
+        case 'newest':
+          products.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+          break;
+        default:
+          products.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       }
     }
     
-    // Tri
-    let sort = { createdAt: -1 };
-    if (req.query.sort === 'price_asc') {
-      sort = { price: 1 };
-    } else if (req.query.sort === 'price_desc') {
-      sort = { price: -1 };
-    } else if (req.query.sort === 'name_asc') {
-      sort = { name: 1 };
-    }
+    // Get unique categories
+    const allProducts = Product.findAll();
+    const categories = [...new Set(allProducts.map(p => p.category))];
     
-    // Exécuter la requête
-    const products = await Product.find(query)
-      .sort(sort)
-      .limit(limit)
-      .skip(skip);
-    
-    const total = await Product.countDocuments(query);
-    
-    // Obtenir toutes les catégories uniques
-    const categories = await Product.distinct('category');
+    // Pagination
+    const total = products.length;
+    const paginatedProducts = products.slice(skip, skip + limit);
     
     res.json({
-      products,
+      products: paginatedProducts,
       pagination: {
         currentPage: page,
         totalPages: Math.ceil(total / limit),
         totalProducts: total,
-        hasMore: skip + products.length < total
+        hasMore: skip + limit < total
       },
       categories
     });
@@ -101,7 +111,7 @@ router.get('/', async (req, res) => {
 // GET un produit par ID
 router.get('/:id', async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = Product.findById(req.params.id);
     if (!product) {
       return res.status(404).json({ message: 'Produit non trouvé' });
     }
@@ -111,69 +121,77 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// POST créer un produit (admin seulement)
+// POST créer un nouveau produit (admin seulement)
 router.post('/', auth, isAdmin, upload.single('image'), async (req, res) => {
   try {
+    const { name, price, description, category, stock, colors, sizes } = req.body;
+    
     const productData = {
-      name: req.body.name,
-      price: req.body.price,
-      description: req.body.description,
-      category: req.body.category,
-      stock: req.body.stock,
+      name,
+      price: parseFloat(price),
+      description,
+      category,
+      stock: parseInt(stock) || 0,
       image: req.file ? `/uploads/${req.file.filename}` : '',
-      colors: req.body.colors ? JSON.parse(req.body.colors) : [],
-      sizes: req.body.sizes ? JSON.parse(req.body.sizes) : []
+      colors: colors ? JSON.parse(colors) : [],
+      sizes: sizes ? JSON.parse(sizes) : []
     };
 
-    const product = new Product(productData);
-    const newProduct = await product.save();
-    res.status(201).json(newProduct);
+    const product = Product.create(productData);
+    res.status(201).json(product);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
 // PUT mettre à jour un produit (admin seulement)
 router.put('/:id', auth, isAdmin, upload.single('image'), async (req, res) => {
   try {
-    const updateData = {
-      name: req.body.name,
-      price: req.body.price,
-      description: req.body.description,
-      category: req.body.category,
-      stock: req.body.stock,
-      colors: req.body.colors ? JSON.parse(req.body.colors) : [],
-      sizes: req.body.sizes ? JSON.parse(req.body.sizes) : []
+    const { name, price, description, category, stock, colors, sizes } = req.body;
+    
+    const updates = {
+      name,
+      price: parseFloat(price),
+      description,
+      category,
+      stock: parseInt(stock) || 0,
+      colors: colors ? JSON.parse(colors) : [],
+      sizes: sizes ? JSON.parse(sizes) : []
     };
 
     if (req.file) {
-      updateData.image = `/uploads/${req.file.filename}`;
+      updates.image = `/uploads/${req.file.filename}`;
     }
 
-    const product = await Product.findByIdAndUpdate(
-      req.params.id,
-      updateData,
-      { new: true }
-    );
-
+    const product = Product.update(req.params.id, updates);
     if (!product) {
       return res.status(404).json({ message: 'Produit non trouvé' });
     }
 
     res.json(product);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
 // DELETE supprimer un produit (admin seulement)
 router.delete('/:id', auth, isAdmin, async (req, res) => {
   try {
-    const product = await Product.findByIdAndDelete(req.params.id);
-    if (!product) {
+    const deleted = Product.delete(req.params.id);
+    if (!deleted) {
       return res.status(404).json({ message: 'Produit non trouvé' });
     }
-    res.json({ message: 'Produit supprimé' });
+    res.json({ message: 'Produit supprimé avec succès' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// GET produits par catégorie
+router.get('/category/:category', async (req, res) => {
+  try {
+    const products = Product.findByCategory(req.params.category);
+    res.json(products);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
