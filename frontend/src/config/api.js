@@ -1,17 +1,20 @@
-// API Configuration for Production
+// API Configuration for Production - Force cache refresh
 const API_CONFIG = {
   baseURL: 'https://millieshop.onrender.com'
 };
 
 export const API_BASE_URL = API_CONFIG.baseURL;
 
-// Helper function for API calls
+// Helper function for API calls with cache busting
 export const apiCall = async (endpoint, options = {}) => {
   const url = `${API_BASE_URL}${endpoint}`;
   
   const defaultOptions = {
     headers: {
       'Content-Type': 'application/json',
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0',
       ...options.headers
     }
   };
