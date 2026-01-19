@@ -1,47 +1,25 @@
-const db = require('../utils/githubStorage');
+const db = require('../utils/database');
 
 class Order {
-  static create(orderData) {
-    const order = {
-      user: orderData.user || null,
-      customerInfo: orderData.customerInfo,
-      items: orderData.items || [],
-      total: parseFloat(orderData.total) || 0,
-      status: orderData.status || 'pending',
-      shippingAddress: orderData.shippingAddress || {},
-      paymentMethod: orderData.paymentMethod || 'cash'
-    };
-    
-    return db.insert('orders', order);
+  static async create(orderData) {
+    return await db.createOrder(orderData);
   }
 
-  static findById(id) {
-    return db.findOne('orders', { _id: id });
+  static async findById(id) {
+    const result = await db.query('SELECT * FROM orders WHERE id = $1', [id]);
+    return result.rows[0];
   }
 
-  static findByUser(userId) {
-    return db.find('orders', { user: userId });
+  static async findByUser(userId) {
+    return await db.getOrdersByUser(userId);
   }
 
-  static findAll() {
-    return db.findAll('orders');
+  static async findAll() {
+    return await db.getAllOrders();
   }
 
-  static update(id, updates) {
-    if (updates.total) updates.total = parseFloat(updates.total);
-    return db.update('orders', id, updates);
-  }
-
-  static delete(id) {
-    return db.delete('orders', id);
-  }
-
-  static count(criteria = {}) {
-    return db.count('orders', criteria);
-  }
-
-  static updateStatus(id, status) {
-    return db.update('orders', id, { status });
+  static async updateStatus(id, status) {
+    return await db.updateOrderStatus(id, status);
   }
 }
 

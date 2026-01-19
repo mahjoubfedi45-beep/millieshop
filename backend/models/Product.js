@@ -1,51 +1,28 @@
-const db = require('../utils/githubStorage');
+const db = require('../utils/database');
 
 class Product {
-  static create(productData) {
-    const product = {
-      name: productData.name,
-      price: parseFloat(productData.price),
-      description: productData.description || '',
-      category: productData.category || 'Autre',
-      stock: parseInt(productData.stock) || 0,
-      image: productData.image || '',
-      gallery: productData.gallery || [],
-      colors: productData.colors || [],
-      sizes: productData.sizes || [],
-      featured: productData.featured || false
-    };
-    
-    return db.insert('products', product);
+  static async create(productData) {
+    return await db.createProduct(productData);
   }
 
-  static findById(id) {
-    return db.findOne('products', { _id: id });
+  static async findById(id) {
+    return await db.getProductById(id);
   }
 
-  static findByCategory(category) {
-    return db.find('products', { category });
+  static async findAll() {
+    return await db.getAllProducts();
   }
 
-  static findAll() {
-    return db.findAll('products');
+  static async update(id, updates) {
+    return await db.updateProduct(id, updates);
   }
 
-  static update(id, updates) {
-    if (updates.price) updates.price = parseFloat(updates.price);
-    if (updates.stock) updates.stock = parseInt(updates.stock);
-    return db.update('products', id, updates);
+  static async delete(id) {
+    return await db.deleteProduct(id);
   }
 
-  static delete(id) {
-    return db.delete('products', id);
-  }
-
-  static count(criteria = {}) {
-    return db.count('products', criteria);
-  }
-
-  static search(query) {
-    const products = db.findAll('products');
+  static async search(query) {
+    const products = await db.getAllProducts();
     return products.filter(product => 
       product.name.toLowerCase().includes(query.toLowerCase()) ||
       product.description.toLowerCase().includes(query.toLowerCase()) ||

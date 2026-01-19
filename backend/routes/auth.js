@@ -54,7 +54,7 @@ router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
     // Trouver l'utilisateur
-    const user = User.findByEmail(email);
+    const user = await User.findByEmail(email);
     if (!user) {
       return res.status(401).json({ message: 'Email ou mot de passe incorrect' });
     }
@@ -66,19 +66,19 @@ router.post('/login', async (req, res) => {
     }
 
     // Créer le token
-    const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
 
     res.json({
       message: 'Connexion réussie',
       token,
       user: {
-        id: user._id,
+        id: user.id,
         name: user.name,
         email: user.email,
         role: user.role,
         address: user.address,
         phone: user.phone,
-        createdAt: user.createdAt
+        createdAt: user.created_at
       }
     });
   } catch (error) {
