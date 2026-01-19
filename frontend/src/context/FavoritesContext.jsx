@@ -1,5 +1,6 @@
-import { createContext, useState, useContext, useEffect } from 'react';
+import { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import { useAuth } from './AuthContext';
+import { API_BASE_URL } from '../config/api';
 
 const FavoritesContext = createContext();
 
@@ -16,20 +17,12 @@ export const FavoritesProvider = ({ children }) => {
   const [favorites, setFavorites] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (user && token) {
-      fetchFavorites();
-    } else {
-      setFavorites([]);
-    }
-  }, [user, token]);
-
-  const fetchFavorites = async () => {
+  const fetchFavorites = useCallback(async () => {
     if (!token) return;
     
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/favorites', {
+      const response = await fetch(`${API_BASE_URL}/api/favorites`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -44,7 +37,15 @@ export const FavoritesProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
+
+  useEffect(() => {
+    if (user && token) {
+      fetchFavorites();
+    } else {
+      setFavorites([]);
+    }
+  }, [user, token, fetchFavorites]);
 
   const addToFavorites = async (product) => {
     if (!user) {
@@ -53,7 +54,7 @@ export const FavoritesProvider = ({ children }) => {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/favorites', {
+      const response = await fetch(`${API_BASE_URL}/api/favorites`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -77,7 +78,7 @@ export const FavoritesProvider = ({ children }) => {
 
   const removeFromFavorites = async (productId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/favorites/${productId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/favorites/${productId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

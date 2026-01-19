@@ -56,7 +56,7 @@ export default function Home() {
             {siteSettings.homeCategories.map((category, index) => (
               <Link 
                 key={index} 
-                to={`/shop?category=${category.name.toLowerCase()}`}
+                to={`/shop?category=${category.name}`}
                 className="category-card"
               >
                 <div className="category-image">

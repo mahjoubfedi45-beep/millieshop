@@ -46,9 +46,9 @@ router.get('/', async (req, res) => {
       query.name = { $regex: req.query.search, $options: 'i' };
     }
     
-    // Filtre par catégorie
+    // Filtre par catégorie - case insensitive matching
     if (req.query.category && req.query.category !== 'all') {
-      query.category = req.query.category;
+      query.category = { $regex: new RegExp(`^${req.query.category}$`, 'i') };
     }
     
     // Filtre par prix

@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { API_BASE_URL } from '../config/api';
 import './ProductDetail.css';
 
 export default function ProductDetail() {
@@ -11,20 +12,25 @@ export default function ProductDetail() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
-  const [selectedImage, setSelectedImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState('');
   const [selectedColor, setSelectedColor] = useState('');
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [images, setImages] = useState([]);
 
-  useEffect(() => {
-    fetchProduct();
-  }, [id]);
-
-  const fetchProduct = async () => {
+  const fetchProduct = useCallback(async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/products/${id}`);
+      const response = await fetch(`${API_BASE_URL}/api/products/${id}`);
       if (response.ok) {
         const data = await response.json();
         setProduct(data);
+        
+        // Create images array - main image + gallery images if they exist
+        const productImages = [data.image];
+        if (data.gallery && data.gallery.length > 0) {
+          productImages.push(...data.gallery);
+        }
+        setImages(productImages);
       } else {
         navigate('/shop');
       }
@@ -34,6 +40,27 @@ export default function ProductDetail() {
     } finally {
       setLoading(false);
     }
+  }, [id, navigate]);
+
+  useEffect(() => {
+    fetchProduct();
+  }, [fetchProduct]);
+
+  const openImageModal = (index) => {
+    setSelectedImageIndex(index);
+    setShowImageModal(true);
+  };
+
+  const closeImageModal = () => {
+    setShowImageModal(false);
+  };
+
+  const nextImage = () => {
+    setSelectedImageIndex((prev) => (prev + 1) % images.length);
+  };
+
+  const prevImage = () => {
+    setSelectedImageIndex((prev) => (prev - 1 + images.length) % images.length);
   };
 
   const handleAddToCart = () => {
@@ -100,8 +127,10 @@ export default function ProductDetail() {
         <div className="product-images">
           <div className="main-image">
             <img 
-              src={`http://localhost:5000${product.image}`} 
+              src={`${API_BASE_URL}${images[selectedImageIndex]}`} 
               alt={product.name}
+              onClick={() => openImageModal(selectedImageIndex)}
+              style={{ cursor: 'pointer' }}
               onError={(e) => {
                 e.target.src = 'https://via.placeholder.com/500x500?text=No+Image';
               }}
@@ -111,7 +140,32 @@ export default function ProductDetail() {
                 <span>Rupture de stock</span>
               </div>
             )}
+            <div className="image-zoom-hint">🔍 Cliquez pour agrandir</div>
           </div>
+          
+          {/* Image Gallery Thumbnails */}
+          {images.length > 1 && (
+            <div className="image-gallery">
+              <h4>Galerie d'images</h4>
+              <div className="thumbnails">
+                {images.map((image, index) => (
+                  <div 
+                    key={index}
+                    className={`thumbnail ${selectedImageIndex === index ? 'active' : ''}`}
+                    onClick={() => setSelectedImageIndex(index)}
+                  >
+                    <img 
+                      src={`${API_BASE_URL}${image}`} 
+                      alt={`${product.name} - Image ${index + 1}`}
+                      onError={(e) => {
+                        e.target.src = 'https://via.placeholder.com/100x100?text=No+Image';
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="product-info">
@@ -249,6 +303,58 @@ export default function ProductDetail() {
           </div>
         </div>
       </div>
+
+      {/* Image Modal */}
+      {showImageModal && (
+        <div className="image-modal" onClick={closeImageModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={closeImageModal}>×</button>
+            
+            <div className="modal-image-container">
+              {images.length > 1 && (
+                <button className="modal-nav prev" onClick={prevImage}>‹</button>
+              )}
+              
+              <img 
+                src={`${API_BASE_URL}${images[selectedImageIndex]}`} 
+                alt={`${product.name} - Image ${selectedImageIndex + 1}`}
+                className="modal-image"
+                onError={(e) => {
+                  e.target.src = 'https://via.placeholder.com/800x800?text=No+Image';
+                }}
+              />
+              
+              {images.length > 1 && (
+                <button className="modal-nav next" onClick={nextImage}>›</button>
+              )}
+            </div>
+            
+            {images.length > 1 && (
+              <div className="modal-thumbnails">
+                {images.map((image, index) => (
+                  <div 
+                    key={index}
+                    className={`modal-thumbnail ${selectedImageIndex === index ? 'active' : ''}`}
+                    onClick={() => setSelectedImageIndex(index)}
+                  >
+                    <img 
+                      src={`${API_BASE_URL}${image}`} 
+                      alt={`Thumbnail ${index + 1}`}
+                      onError={(e) => {
+                        e.target.src = 'https://via.placeholder.com/60x60?text=No+Image';
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+            
+            <div className="modal-info">
+              <p>{selectedImageIndex + 1} / {images.length}</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

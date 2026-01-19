@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useFavorites } from '../context/FavoritesContext';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { API_BASE_URL } from '../config/api';
 import './Favorites.css';
 
 export default function Favorites() {
@@ -70,7 +71,7 @@ export default function Favorites() {
                 style={{ cursor: 'pointer' }}
               >
                 <img 
-                  src={`http://localhost:5000${product.image}`} 
+                  src={`${API_BASE_URL}${product.image}`} 
                   alt={product.name}
                   onError={(e) => {
                     e.target.src = 'https://via.placeholder.com/300x300?text=No+Image';

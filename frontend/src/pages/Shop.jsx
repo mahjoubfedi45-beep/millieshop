@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { API_BASE_URL } from '../config/api';
 import './Shop.css';
 
 export default function Shop() {
@@ -31,11 +32,7 @@ export default function Shop() {
     }
   }, [searchParams]);
 
-  useEffect(() => {
-    fetchProducts();
-  }, [currentPage, search, selectedCategory, minPrice, maxPrice, sort]);
-
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams({
@@ -49,7 +46,7 @@ export default function Shop() {
       if (maxPrice) params.append('maxPrice', maxPrice);
       if (sort !== 'newest') params.append('sort', sort);
       
-      const response = await fetch(`http://localhost:5000/api/products?${params}`);
+      const response = await fetch(`${API_BASE_URL}/api/products?${params}`);
       const data = await response.json();
       
       setProducts(data.products);
@@ -61,7 +58,11 @@ export default function Shop() {
       console.error('Erreur:', error);
       setLoading(false);
     }
-  };
+  }, [currentPage, search, selectedCategory, minPrice, maxPrice, sort]);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -123,9 +124,11 @@ export default function Shop() {
             onChange={(e) => handleCategoryChange(e.target.value)}
           >
             <option value="all">Toutes les catégories</option>
-            {categories.map(cat => (
-              <option key={cat} value={cat}>{cat}</option>
-            ))}
+            {categories
+              .filter(cat => !['homme', 'Homme', 'HOMME'].includes(cat))
+              .map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
           </select>
 
           <input
@@ -178,21 +181,13 @@ export default function Shop() {
           <div className="products-grid">
             {products.map(product => (
               <div className="product-card" key={product._id}>
-                <button 
-                  className="btn-favorite"
-                  onClick={() => toggleFavorite(product)}
-                  title="Fonctionnalité non disponible"
-                >
-                  🤍
-                </button>
-
                 <div className="product-image">
                   <Link to={`/product/${product._id}`}>
                     <img 
-                      src={`http://localhost:5000${product.image}`} 
+                      src={`${API_BASE_URL}${product.image}`} 
                       alt={product.name}
                       onError={(e) => {
-                        e.target.src = 'https://via.placeholder.com/300x300?text=No+Image';
+                        e.target.src = 'https://via.placeholder.com/400x400?text=No+Image';
                       }}
                     />
                   </Link>
@@ -202,11 +197,28 @@ export default function Shop() {
                 </div>
 
                 <div className="product-info">
-                  <span className="product-category">{product.category}</span>
                   <Link to={`/product/${product._id}`}>
                     <h3>{product.name}</h3>
                   </Link>
-                  <p className="product-description">{product.description}</p>
+                  
+                  {/* Sizes with stock */}
+                  {product.sizes && product.sizes.length > 0 && (
+                    <div className="product-sizes">
+                      <span className="sizes-label">Tailles:</span>
+                      <div className="sizes-list">
+                        {product.sizes.map((size, index) => (
+                          <span 
+                            key={index} 
+                            className={`size-badge ${size.stock === 0 ? 'out-of-stock' : ''}`}
+                            title={`${size.size} - Stock: ${size.stock}`}
+                          >
+                            {size.size}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
                   <div className="product-footer">
                     <p className="product-price">{product.price} TND</p>
                     <button 
@@ -214,7 +226,7 @@ export default function Shop() {
                       onClick={() => addToCart(product)}
                       disabled={product.stock === 0}
                     >
-                      {product.stock === 0 ? 'Indisponible' : 'Ajouter au panier'}
+                      {product.stock === 0 ? 'Indisponible' : 'Ajouter'}
                     </button>
                   </div>
                 </div>
