@@ -72,6 +72,7 @@ export default function AdminPanel() {
   }, []);
 
   // Effet séparé pour charger les données quand le token est disponible
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (adminToken && isAuthenticated) {
       fetchProducts();

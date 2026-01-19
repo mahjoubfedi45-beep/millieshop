@@ -90,11 +90,6 @@ export default function Shop() {
     }
   };
 
-  const toggleFavorite = (product) => {
-    // Fonctionnalité désactivée - pas de système de favoris
-    alert('Fonctionnalité non disponible');
-  };
-
   if (loading && products.length === 0) {
     return <div className="loading-container"><h2>⏳ Chargement...</h2></div>;
   }

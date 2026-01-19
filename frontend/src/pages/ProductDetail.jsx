@@ -156,7 +156,7 @@ export default function ProductDetail() {
                   >
                     <img 
                       src={`${API_BASE_URL}${image}`} 
-                      alt={`${product.name} - Image ${index + 1}`}
+                      alt={`${product.name} view ${index + 1}`}
                       onError={(e) => {
                         e.target.src = 'https://via.placeholder.com/100x100?text=No+Image';
                       }}
@@ -317,7 +317,7 @@ export default function ProductDetail() {
               
               <img 
                 src={`${API_BASE_URL}${images[selectedImageIndex]}`} 
-                alt={`${product.name} - Image ${selectedImageIndex + 1}`}
+                alt={`${product.name} view ${selectedImageIndex + 1}`}
                 className="modal-image"
                 onError={(e) => {
                   e.target.src = 'https://via.placeholder.com/800x800?text=No+Image';
