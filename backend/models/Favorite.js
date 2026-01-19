@@ -1,23 +1,35 @@
-const mongoose = require('mongoose');
+const db = require('../utils/database');
 
-const favoriteSchema = new mongoose.Schema({
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
-  },
-  product: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Product',
-    required: true
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
+class Favorite {
+  static create(favoriteData) {
+    const favorite = {
+      user: favoriteData.user,
+      product: favoriteData.product
+    };
+    
+    return db.insert('favorites', favorite);
   }
-});
 
-// Index pour éviter les doublons
-favoriteSchema.index({ user: 1, product: 1 }, { unique: true });
+  static findByUser(userId) {
+    return db.find('favorites', { user: userId });
+  }
 
-module.exports = mongoose.model('Favorite', favoriteSchema);
+  static findByUserAndProduct(userId, productId) {
+    return db.findOne('favorites', { user: userId, product: productId });
+  }
+
+  static delete(id) {
+    return db.delete('favorites', id);
+  }
+
+  static deleteByUserAndProduct(userId, productId) {
+    const favorites = db.findAll('favorites');
+    const favorite = favorites.find(f => f.user === userId && f.product === productId);
+    if (favorite) {
+      return db.delete('favorites', favorite._id);
+    }
+    return false;
+  }
+}
+
+module.exports = Favorite;

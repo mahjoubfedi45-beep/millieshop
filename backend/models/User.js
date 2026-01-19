@@ -1,55 +1,56 @@
-const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const db = require('../utils/database');
 
-const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    lowercase: true,
-    trim: true
-  },
-  password: {
-    type: String,
-    required: true,
-    minlength: 6
-  },
-  role: {
-    type: String,
-    enum: ['client', 'admin'],
-    default: 'client'
-  },
-  address: {
-    type: String,
-    default: ''
-  },
-  phone: {
-    type: String,
-    default: ''
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
+class User {
+  static async create(userData) {
+    // Hash password before saving
+    if (userData.password) {
+      userData.password = await bcrypt.hash(userData.password, 10);
+    }
+    
+    const user = {
+      name: userData.name,
+      email: userData.email.toLowerCase(),
+      password: userData.password,
+      role: userData.role || 'client',
+      address: userData.address || '',
+      phone: userData.phone || ''
+    };
+    
+    return db.insert('users', user);
   }
-});
 
-// Hash password avant de sauvegarder
-userSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) {
-    return next();
+  static findByEmail(email) {
+    return db.findOne('users', { email: email.toLowerCase() });
   }
-  this.password = await bcrypt.hash(this.password, 10);
-  next();
-});
 
-// Méthode pour comparer les mots de passe
-userSchema.methods.comparePassword = async function(candidatePassword) {
-  return await bcrypt.compare(candidatePassword, this.password);
-};
+  static findById(id) {
+    return db.findOne('users', { _id: id });
+  }
 
-module.exports = mongoose.model('User', userSchema);
+  static findByRole(role) {
+    return db.find('users', { role });
+  }
+
+  static async comparePassword(plainPassword, hashedPassword) {
+    return await bcrypt.compare(plainPassword, hashedPassword);
+  }
+
+  static update(id, updates) {
+    return db.update('users', id, updates);
+  }
+
+  static delete(id) {
+    return db.delete('users', id);
+  }
+
+  static count(criteria = {}) {
+    return db.count('users', criteria);
+  }
+
+  static findAll() {
+    return db.findAll('users');
+  }
+}
+
+module.exports = User;
