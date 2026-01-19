@@ -17,18 +17,18 @@ export default function Footer() {
               qui reflètent votre personnalité et subliment votre féminité.
             </p>
             <div className="social-links">
-              <a href="#" className="social-link" aria-label="Facebook">
+              <button className="social-link" aria-label="Facebook">
                 📘
-              </a>
-              <a href="#" className="social-link" aria-label="Instagram">
+              </button>
+              <button className="social-link" aria-label="Instagram">
                 📷
-              </a>
-              <a href="#" className="social-link" aria-label="Twitter">
+              </button>
+              <button className="social-link" aria-label="Twitter">
                 🐦
-              </a>
-              <a href="#" className="social-link" aria-label="YouTube">
+              </button>
+              <button className="social-link" aria-label="YouTube">
                 📺
-              </a>
+              </button>
             </div>
           </div>
 
