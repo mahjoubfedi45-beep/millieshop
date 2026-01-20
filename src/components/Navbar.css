@@ -1,0 +1,142 @@
+.navbar {
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid #f0ede8;
+  color: #2c2c2c;
+  padding: 0;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 30px;
+  height: 80px;
+}
+
+.navbar-logo {
+  font-size: 2rem;
+  font-weight: 400;
+  color: #2c2c2c;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-family: 'Playfair Display', serif;
+  letter-spacing: 1px;
+}
+
+.navbar-logo:hover {
+  color: #c8a882;
+  transform: scale(1.02);
+}
+
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.navbar-link {
+  color: #555555;
+  text-decoration: none;
+  padding: 12px 20px;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Lato', sans-serif;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.navbar-link:hover {
+  background: rgba(200, 168, 130, 0.08);
+  color: #c8a882;
+  transform: translateY(-1px);
+}
+
+.navbar-link.btn-login {
+  background: linear-gradient(45deg, #2c2c2c, #404040);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-left: 15px;
+}
+
+.navbar-link.btn-login:hover {
+  background: linear-gradient(45deg, #404040, #555555);
+  color: white;
+  box-shadow: 0 4px 15px rgba(44, 44, 44, 0.25);
+}
+
+.navbar-link.admin-link {
+  background: rgba(212, 165, 116, 0.2);
+  border: 1px solid rgba(212, 165, 116, 0.4);
+}
+
+.navbar-link.admin-link:hover {
+  background: rgba(212, 165, 116, 0.3);
+  box-shadow: 0 4px 12px rgba(212, 165, 116, 0.3);
+}
+
+.navbar-link.admin-panel-link {
+  background: rgba(220, 53, 69, 0.1);
+  border: 1px solid rgba(220, 53, 69, 0.3);
+  color: #dc3545;
+  font-weight: 700;
+}
+
+.navbar-link.admin-panel-link:hover {
+  background: #dc3545;
+  color: white;
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+.cart-badge {
+  background: #e53e3e;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 4px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+@media (max-width: 768px) {
+  .navbar-container {
+    padding: 0 15px;
+  }
+  
+  .navbar-logo {
+    font-size: 1.5rem;
+  }
+  
+  .navbar-links {
+    gap: 5px;
+  }
+  
+  .navbar-link {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+}

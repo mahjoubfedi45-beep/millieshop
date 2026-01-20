@@ -1,17 +1,47 @@
 {
-  "name": "millie-shop",
-  "version": "1.0.0",
-  "description": "E-commerce website for Millie Shop - Women's Fashion",
-  "scripts": {
-    "install-all": "cd backend && npm install && cd ../frontend && npm install",
-    "dev": "concurrently \"cd backend && npm run dev\" \"cd frontend && npm start\"",
-    "build": "cd frontend && npm run build",
-    "start": "cd backend && npm start"
+  "name": "millie-shop-frontend",
+  "version": "1.0.1",
+  "private": true,
+  "dependencies": {
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.1",
+    "@testing-library/user-event": "^13.5.0",
+    "axios": "^1.13.2",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "react-router-dom": "^7.10.1",
+    "react-scripts": "^5.0.1",
+    "web-vitals": "^2.1.4"
   },
-  "keywords": ["ecommerce", "react", "nodejs", "fashion", "millie-shop"],
-  "author": "Millie Shop",
-  "license": "ISC",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
   "devDependencies": {
-    "concurrently": "^7.6.0"
+    "@tailwindcss/postcss": "^4.1.18",
+    "autoprefixer": "^10.4.23",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.18"
   }
 }
